@@ -1,6 +1,8 @@
 import requests
-def fetch_stock_data(ticker):
+import logging
 
+def fetch_stock_data(ticker):
+    logging.info(f"Start downloading data for {ticker}")
     url = "https://www.alphavantage.co/query"
 
     params = {
@@ -12,12 +14,13 @@ def fetch_stock_data(ticker):
 
 
     response = requests.get(url, params=params)
-    print(response.status_code)
+    logging.info(f"API response status code: {response.status_code}")
 
 
     data = response.json()
     quote = data.get("Global Quote")
     if not quote:
+        logging.warning(f"No stock data for {ticker}")
         return None
     price = float(quote["05. price"])
     open = float(quote["02. open"])
@@ -38,5 +41,12 @@ def fetch_stock_data(ticker):
     "Previous Close": previous_close,
 
     }
+    logging.info(f"Successfully downloaded data for {ticker}")
     return clean_data
-print(fetch_stock_data("IBM"))
+if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(levelname)s | %(message)s"
+
+    )
+    print(fetch_stock_data("IBM"))

@@ -1,11 +1,12 @@
 import psycopg
 from fetch_stock_data import fetch_stock_data
 from getpass import getpass
+import logging
 
 def save_stock_data(stock):
    if stock is None:
       return None
-   
+   logging.info("Start INSERT to databse")
    password = getpass("Hasło do postgers: ")
    with psycopg.connect(
       dbname="data_engineering", 
@@ -40,5 +41,17 @@ def save_stock_data(stock):
 
     )
          )
-stock_data = fetch_stock_data("IBM")
-save_stock_data(stock_data)
+         inserted_rows = cur.rowcount
+   if inserted_rows == 1:
+      logging.info("New stock record inserted")
+   else:
+      logging.info("Stock record already exists - skipped")
+   logging.info("Database operation completed")
+if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(levelname)s | %(message)s"
+    )
+
+    stock_data = fetch_stock_data("IBM")
+    save_stock_data(stock_data)
